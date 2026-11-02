@@ -30,6 +30,10 @@ REPEAT_THRESHOLD = 0.4
 # Paragraphs with fewer words than this are dropped (mostly chart labels)
 MIN_WORDS = 4
 
+# Lines shorter than this are treated as chart/table labels and dropped,
+# unless they end a sentence (the last line of a paragraph is often short)
+MIN_LINE_CHARS = 35
+
 
 # ---------- Helper functions ----------
 
@@ -60,6 +64,15 @@ def is_numeric_junk(line):
     letters = sum(c.isalpha() for c in chars)
     return letters / len(chars) < 0.3
 
+def is_label_line(line):
+    """True for short lines that look like chart/table labels, e.g. 'Food Inflation'.
+    Normal text lines in these reports are 40+ characters wide."""
+    if line.lower().startswith("source:"):
+        return True
+    if len(line) >= MIN_LINE_CHARS:
+        return False
+    ends_sentence = line.endswith((".", "?", "!"))
+    return not ends_sentence
 
 def join_into_paragraphs(lines):
     """PDFs break sentences into many lines. Glue a line onto the previous one
@@ -95,6 +108,9 @@ def clean_page(text, repeated_lines, stats):
             continue
         if is_numeric_junk(line):
             stats["numeric_lines"] += 1
+            continue
+        if is_label_line(line):
+            stats["label_lines"] += 1
             continue
         kept_lines.append(line)
 
