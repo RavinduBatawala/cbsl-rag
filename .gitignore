@@ -222,3 +222,4 @@ __marimo__/
 # Project data (too big for GitHub)
 data/raw/
 data/processed/
+data/vectordb/
