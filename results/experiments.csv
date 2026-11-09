@@ -1,0 +1,2 @@
+date,experiment,n_questions,hit@1,hit@5,hit@10,mrr
+2026-11-09 11:02,baseline,41,0.439,0.683,0.732,0.534
